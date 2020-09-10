@@ -1,0 +1,22 @@
+{
+    "name": "gnol-file-upload",
+    "description": "一个实用的 web 页面文件上传插件。",
+    "authors": [
+        "吴佳隆"
+    ],
+    "license": "AGPL-3.0",
+    "keywords": [
+        "file",
+        "upload",
+        "吴佳隆"
+    ],
+    "homepage": "https://gitee.com/wujialong576/gnol-file-upload.git",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {}
+}
