@@ -214,7 +214,7 @@ function watch() {
             scroll: false
         },
         logLevel: "info",
-        logPrefix: "gnol", // 更改控制台日志前缀
+        logPrefix: "d7c", // 更改控制台日志前缀
         browser: ["chrome"], // 设置监听时打开的浏览器
         notify: false,
         host: getIP(),
