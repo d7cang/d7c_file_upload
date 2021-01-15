@@ -1,5 +1,5 @@
 {
-    "name": "gnol-file-upload",
+    "name": "d7c_file_upload",
     "description": "一个实用的 web 页面文件上传插件。",
     "authors": [
         "吴佳隆"
@@ -10,7 +10,7 @@
         "upload",
         "吴佳隆"
     ],
-    "homepage": "https://gitee.com/wujialong576/gnol-file-upload.git",
+    "homepage": "https://gitee.com/wujialong576/d7c_file_upload.git",
     "ignore": [
         "**/.*",
         "node_modules",

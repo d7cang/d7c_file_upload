@@ -1,4 +1,4 @@
-# gnol-file-upload
+# d7c_file_upload
 
 #### 介绍
     一个实用的 web 页面文件上传插件
