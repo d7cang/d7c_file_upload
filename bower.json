@@ -10,7 +10,7 @@
         "upload",
         "吴佳隆"
     ],
-    "homepage": "https://gitee.com/wujialong576/d7c_file_upload.git",
+    "homepage": "https://gitee.com/d7c_admin/d7c_file_upload.git",
     "ignore": [
         "**/.*",
         "node_modules",
