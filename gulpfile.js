@@ -92,12 +92,16 @@ function css() {
 }
 
 // 操作 javascript
+const babel = require('gulp-babel');
 const uglify = require('gulp-uglify');
 
 function js() {
     let js = gulp.src(paths.js.src, {
             sourcemaps: true
         })
+        .pipe(babel({
+            presets: ['es2015']
+        }))
         .pipe(uglify()) // 压缩 javascript
         .pipe(rename({
             extname: '.min.js'
