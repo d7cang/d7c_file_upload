@@ -14,15 +14,17 @@
 #### 使用说明
 1.  运行项目 gulp / gulp build
 
-### 捐助
+#### 捐助
 &emsp;&emsp;如果您觉得我们的开源软件对你有所帮助，请扫下方二维码打赏我们一杯咖啡。
 ![微信收款码](https://images.gitee.com/uploads/images/2021/0222/174352_b22739f5_1070311.jpeg "微信收款码.jpg")
 ![微信赞赏码](https://images.gitee.com/uploads/images/2021/0222/174521_67e18b39_1070311.jpeg "微信赞赏码.jpg")
 ![支付宝收款码](https://images.gitee.com/uploads/images/2021/0222/174540_94a9ac41_1070311.jpeg "支付宝收款码.jpg")
 
 #### 参与贡献
-1.  创建本仓库
-2.  初始化项目
+1.  Fork 本仓库
+2.  新建 d7c_file_upload_xxx 分支
+3.  提交代码
+4.  新建 Pull Request
 
 #### 码云特技
 1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
