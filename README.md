@@ -7,9 +7,11 @@
 &emsp;&emsp;一个实用的 web 页面文件上传插件。
 
 #### 安装教程
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  在远程仓库中新建该项目，并 check 一份到本地
+2.  check 一份 [https://gitee.com/d7c/d7c_nodejs_gulp.git](https://gitee.com/d7c/d7c_nodejs_gulp.git) 项目，并将全部内容拷贝到该项目的目录下
+3.  修改根目录下 bower.json、package.json 中相关内容
+4.  在项目根目录下执行 npm install 和 bower install
+5.  运行项目 gulp / gulp build
 
 #### 使用说明
 1.  运行项目 gulp / gulp build
