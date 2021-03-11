@@ -22,7 +22,9 @@
     ],
     "author": "吴佳隆",
     "license": "AGPL-3.0",
-    "dependencies": {},
+    "dependencies": {
+        "jquery": "^3.5.1"
+    },
     "devDependencies": {
         "babel-cli": "^6.26.0",
         "babel-core": "^6.26.3",

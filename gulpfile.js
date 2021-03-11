@@ -44,7 +44,11 @@ const paths = {
         {
             src: 'src/fonts/*.*',
             dest: 'dist/fonts/'
-        }
+        },
+        {
+            src: 'node_modules/jquery/dist/*.*',
+            dest: 'dist/lib/jquery/dist/'
+        },
     ],
     base_src: 'src', // 资源父目录
     base_dest: 'dist', // 目标父目录
