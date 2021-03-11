@@ -221,6 +221,7 @@ function watch() {
         logPrefix: "d7c", // 更改控制台日志前缀
         browser: ["chrome"], // 设置监听时打开的浏览器
         notify: false,
+        codeSync: true,
         host: getIP(),
         port: 8080, // 设置服务器监听的端口号
         ui: {
