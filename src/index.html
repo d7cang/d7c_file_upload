@@ -8,12 +8,28 @@
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     </head>
     <body>
-        <h1>你好，世界！</h1>
+        <div style="width: 80%; height: 80%; margin: 0 auto; background: #CCCCCC;">
+            <div id="d7cFileContainer"></div>
+        </div>
         <script src="./lib/jquery/dist/jquery.min.js"></script>
         <!-- 自定义 d7c.file-upload 脚本 -->
         <script src="./js/d7c.file-upload.min.js"></script>
         <script type="text/javascript">
-            var d7cFile = new D7CFileUpload({"container": "xxxxxxxxxxxx"});
+            let options = {
+                "container": "d7cFileContainer",
+                "append": true,
+                "data": [{
+                    id: 1,
+                    name: "name1",
+                    uri: "uri1"
+                }, {
+                    id: 2,
+                    name: "name2",
+                    uri: "uri2"
+                }]
+            };
+            let d7cFile = new D7CFileUpload(options);
+            d7cFile.initFileList();
         </script>
     </body>
 </html>
