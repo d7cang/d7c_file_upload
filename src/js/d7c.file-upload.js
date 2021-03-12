@@ -20,7 +20,7 @@ function isNotBlank(obj) {
  * @param {Object} filename	文件名
  */
 function getFileExtension(filename) {
-    var startIndex = filename.lastIndexOf(".");
+    let startIndex = filename.lastIndexOf(".");
     if (startIndex == -1) {
         return "";
     }
@@ -33,12 +33,12 @@ function getFileExtension(filename) {
  * @param {Object} filename	文件名
  */
 function isFileType(types, filename) {
-    var fileExtension = getFileExtension(filename);
+    let fileExtension = getFileExtension(filename);
     if (fileExtension == "") {
         return false;
     }
     // return types.indexOf(fileExtension);
-    var flag = false;
+    let flag = false;
     types.find(function(value) {
         if (value == fileExtension) {
             flag = true;
@@ -54,12 +54,12 @@ function isFileType(types, filename) {
  * @return 返回文件大小，单位 KB
  */
 function getFileSize(target) {
-    var isIE = /msie/i.test(navigator.userAgent) && !window.opera;
-    var fileSize = 0;
+    let isIE = /msie/i.test(navigator.userAgent) && !window.opera;
+    let fileSize = 0;
     if (isIE && !target.files) {
-        var filePath = target.value;
-        var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
-        var file = fileSystem.GetFile(filePath);
+        let filePath = target.value;
+        let fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+        let file = fileSystem.GetFile(filePath);
         fileSize = file.Size;
     } else {
         fileSize = target.files[0].size;
@@ -146,12 +146,14 @@ D7CFileUpload.prototype.initFileList = function(options) {
     if (!$.isEmptyObject(data)) {
         num = data.length;
         let keys = this.getValueByKey(options, "dataKey");
+
         $.each(data, function(index, value) {
             html += '<li><span ' + keys[0] + '=\'' + value[keys[0]] + '\' ' + keys[1] + '=\'' + value[keys[1]] +
                 '\' class="red"><i class="ace-icon fa fa-trash-o bigger-130 red"></i></span>' +
                 '<a onclick="window.open(\'' + value[keys[2]] + '\')">' +
                 '<img src="' + value[keys[2]] + '" /></a></li>';
         });
+
         // 删除配置中的数据，因为已经显示了，所以要释放空间
         delete this.config.data;
     }
@@ -182,7 +184,7 @@ D7CFileUpload.prototype.spanAddClick = function(options, container) {
 
 // 给追加按钮添加点击事件
 D7CFileUpload.prototype.appendButton = function(options) {
-    var num = $("#" + this.getValueByKey(options, "container") + " > ul li").length;
+    let num = $("#" + this.getValueByKey(options, "container") + " > ul li").length;
     if (this.getValueByKey(options, "append") && this.getValueByKey(options, "max_num") > num) {
         // 文件列表末尾增加一个 input 内容改变事件
         this.appendInputChange(options);
@@ -197,9 +199,9 @@ D7CFileUpload.prototype.appendInputChange = function(options) {
     let container = that.getValueByKey(options, "container");
     $("#" + container + " > input[display!=none]").on("change", function() {
         // 获取当前容器配置参数
-        var config = d7c_file_config_pool[container];
+        let config = d7c_file_config_pool[container];
         // 获取浏览器类型
-        var browserVersion = window.navigator.userAgent.toUpperCase();
+        let browserVersion = window.navigator.userAgent.toUpperCase();
 
         // 文件类型检测
         if (!isFileType(config.fileTypeStr, this.value)) {
@@ -216,7 +218,7 @@ D7CFileUpload.prototype.appendInputChange = function(options) {
         }
 
         // 单次上传数量检测
-        var file_num = $('#' + container + ' input[name=' + this.name + ']').length;
+        let file_num = $('#' + container + ' input[name=' + this.name + ']').length;
         if (!config.async // 是否是异步请求，true 是
             &&
             file_num > Number(config.max_num)) {
