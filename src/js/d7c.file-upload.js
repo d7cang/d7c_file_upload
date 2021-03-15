@@ -140,6 +140,9 @@ D7CFileUpload.prototype.initConfig = function(options) {
             that.config[index] = value;
         });
     }
+    if ((this.config["container"] + '_span') == this.config["dataKey"][0]) {
+        throw new Error("dataKey 的第一个属性不能为" + this.config["container"] + "_span！");
+    }
     d7c_file_config_pool[this.config.container] = this.config;
 }
 
@@ -354,7 +357,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     }
 
     // 删除按钮的 id 编号
-    let next_del_id = container + '_span_' + that.config["next_del_id"];
+    let next_del_id = container + '_span_' + that.config['next_del_id'];
     // 更新配置池中下一个删除按钮的 id 编号
     d7c_file_config_pool[container]['next_del_id'] = next_del_id + 1;
 
@@ -366,7 +369,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
 
     let keys = that.config["dataKey"];
 
-    let li = '<li><span id=\'' + next_del_id + '\' ';
+    let li = '<li><span ' + container + '_span=\'' + next_del_id + '\' ';
     if (_this.files) { // HTML5实现预览，兼容 chrome、火狐 7+ 等
         if (window.FileReader) {
             let reader = new FileReader();
@@ -427,7 +430,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     }
 
     // 给 span 添加删除事件
-    that.deleteFile($("#" + next_del_id), fileId, filename);
+    that.deleteFile($("#" + container + " ul li span[" + container + "_span=" + next_del_id + "]"), fileId, filename);
 
     // 将当前 input 隐藏并设置删除 id
     $(_this).attr('display', 'none').attr("del", next_del_id);
@@ -468,6 +471,11 @@ D7CFileUpload.prototype.appendInputClick = function(options) {
  * @param {Object} name		文件的名称
  */
 D7CFileUpload.prototype.deleteFile = function(_this, id, name) {
+    if (isBlank(id)) { // 本地删除
+
+    } else { // 即从本地删除，也要从服务端删除
+
+    }
     console.log(_this)
     console.log(id)
     console.log(name)
