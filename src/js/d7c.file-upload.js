@@ -302,7 +302,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
                 let upload_success = that.getValueByKey(options, "upload_success");
                 if (upload_success) {
                     callbacks.add(upload_success);
-                    callbacks.fire(result);
+                    callbacks.fire(_this, result);
                 } else {
                     if (result.status == 200) {
                         that.successMsg("上传成功!");
@@ -316,7 +316,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
                 let upload_error = that.getValueByKey(options, "upload_error");
                 if (upload_error) {
                     callbacks.add(upload_error);
-                    callbacks.fire(jqXHR, textStatus, errorThrown);
+                    callbacks.fire(_this, jqXHR, textStatus, errorThrown);
                 } else {
                     that.errorMsg("服务器异常!");
                 }
@@ -472,40 +472,121 @@ D7CFileUpload.prototype.appendInputClick = function(options) {
  */
 D7CFileUpload.prototype.deleteFile = function(_this, id, name) {
     if (isBlank(id)) { // 本地删除
-
+        this.deleteLocalFile(_this, id, name);
     } else { // 即从本地删除，也要从服务端删除
-
+        this.deleteServerFile(_this, id, name);
     }
-    console.log(_this)
-    console.log(id)
-    console.log(name)
 }
-/* function deleteFile(_this, id, name) {
-    bootbox.confirm({
-        title: "删除确认",
-        message: "确定要删除[" + name + "]文件吗?",
-        buttons: {
-            confirm: {
-                label: "<i class='ace-icon fa fa-trash-o bigger-110'></i>&nbsp; OK",
-                className: 'btn btn-danger btn-xs'
-            },
-            cancel: {
-                label: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Cancel",
-                className: 'btn btn-xs'
-            }
-        },
-        callback: function(result) {
-            // 取消删除
-            if (!result) {
-                return;
-            }
-            if (isBlank(id)) { // 本地删除
-                deleteLocalFile(_this);
-            } else { // 本地和服务器都删除
-                deleteServerFile(_this, id, name);
-            }
-        }
-    });
-}; */
 
-;
+/**
+ * 删除页面未上传的文件
+ * @param {Object} _this	span 对象
+ * @param {Object} id		文件在数据库中的主键
+ * @param {Object} name		文件的名称
+ */
+D7CFileUpload.prototype.deleteLocalFile = function(_this, id, name) {
+    let container = this.config["container"];
+    // 获取 span 标签上绑定的 container + "_span" 属性值
+    let container_span = $(_this).attr(container + "_span");
+    if (!isBlank(container_span)) {
+        // 获取 input 框上 del 属性的值为 container_span 的 input 对象
+        let $input = $("#" + container + " input[del=" + container_span + "]");
+
+        // 清空 input 框文件内容
+        clearInput($input, window.navigator.userAgent.toUpperCase());
+        // 删除 input 框
+        $input.remove();
+    }
+
+    // 获取当前要删除对象的 li 对象
+    let $li = $(_this).parent("li");
+    // 删除 li
+    $li.remove();
+}
+
+/**
+ * 删除服务器上和本地文件
+ * @param {Object} _this	span 对象
+ * @param {Object} id		文件在数据库中的主键
+ * @param {Object} name		文件的名称
+ */
+D7CFileUpload.prototype.deleteServerFile = function(_this, id, name) {
+    let that = this;
+    let container = that.config["container"];
+    // 获取当前容器配置参数
+    var config = d7c_file_config_pool[container];
+
+    // 删除图片 uri
+    var del_uri = config.del_uri;
+    if (isBlank(del_uri)) {
+        that.errorMsg("删除图片 uri 为空，请配置 del_uri 属性！");
+        return;
+    }
+    var keys = config.dataKey;
+    var callbacks = $.Callbacks();
+
+    // 获取当前要删除对象的 li 对象
+    var $li = $(_this).parent("li");
+    // ajax 请求删除文件
+    if ("POST" == config.del_type.toLowerCase()) { // POST 请求
+        var del_data = config.del_data;
+        del_data[keys[0]] = id;
+        del_data[keys[1]] = name;
+        $.ajax({
+            type: config.del_type,
+            data: del_data,
+            url: del_uri,
+            async: true,
+            success: function(result) {
+                if (result.status == 200) { // 删除成功
+                    // 删除页面未上传的文件
+                    that.deleteLocalFile(_this, id, name);
+                }
+
+                // 成功后回调执行
+                let del_success = that.getValueByKey(options, "del_success");
+                if (del_success) {
+                    callbacks.add(del_success);
+                    callbacks.fire(_this, result);
+                } else {
+                    if (result.status == 200) {
+                        that.successMsg("删除成功!");
+                    } else {
+                        that.errorMsg("删除失败!");
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // 失败后回调执行
+                let del_error = that.getValueByKey(options, "del_error");
+                if (del_error) {
+                    callbacks.add(del_error);
+                    callbacks.fire(_this, jqXHR, textStatus, errorThrown);
+                } else {
+                    that.errorMsg("服务器异常!");
+                }
+            }
+        });
+    } else { // 使用 GET 请求
+        var url = del_uri + '?' + keys[0] + '=' + id + '&' + keys[1] + '=' + name + '&tm=' + new Date().getTime();
+        $.get(url, function(result) {
+            if (result.status == 200) { // 删除成功
+                // 删除页面未上传的文件
+                that.deleteLocalFile(_this, id, name);
+            }
+
+            // 成功后回调执行
+            let del_success = that.getValueByKey(options, "del_success");
+            if (del_success) {
+                callbacks.add(del_success);
+                callbacks.fire(_this, result);
+            } else {
+                if (result.status == 200) {
+                    that.successMsg("删除成功!");
+                } else {
+                    that.errorMsg("删除失败!");
+                }
+            }
+        });
+    }
+};
