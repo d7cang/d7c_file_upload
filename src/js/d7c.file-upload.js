@@ -102,30 +102,30 @@ function clearInput(_this, browserVersion) {
 var d7c_file_config_pool = {};
 
 function D7CFileUpload(options) {
-    // 实例默认配置
+    // 实例默认配置，参数类型 N 类：初始化后不可变，M 类：初始化后可变
     this.config = {
-        "container": "containerId", // 容器编号
-        "data": {}, // 数据
-        "name": "file", // input name 属性名
-        "dataKey": ['id', 'name', 'uri'], // 数据 json 中的键值
-        "append": false, // 是否追加
-        "async": true, // 是否异步请求
-        "max_num": 10, // 同步请求时每次最大上传数量
-        "max_size": 100, // 单个上传文件的最大大小 KB
-        "fileTypeStr": ["jpg", "png", "gif", "bmp", "jpeg"], // 允许上传的文件类型，例如支持的文档类型：["doc", "docx", "ppt", "pptx", "xls", "xlsx", "pdf", "txt"]
-        "fileType": 1, // 上传的文件类型，1：图片，2：文档
-        "next_del_id": 0, // 下一个删除按钮的 id 编号
-        "del_uri": "", // 删除图片 uri
-        "del_type": "POST", // 删除图片的请求方式
-        "del_data": {}, // 删除图片时传递的数据
-        "del_success": null, // 删除成功回调函数
-        "del_error": null, // 删除失败回调函数
-        "upload_uri": "", // 上传图片 uri
-        "upload_data": {}, // 上传图片时传递的数据
-        "upload_success": null, // 上传成功回调函数
-        "upload_error": null, // 上传失败回调函数
-        "successMsg": null, // 成功消息提示函数
-        "errorMsg": null, // 错误消息提示函数
+        "container": "containerId", // 容器编号 N
+        "data": {}, // 数据 M
+        "name": "file", // input name 属性名 N
+        "dataKey": ['id', 'name', 'uri'], // 数据 json 中的键值 N
+        "append": false, // 是否追加 N
+        "async": true, // 是否异步请求 M
+        "max_num": 10, // 同步请求时每次最大上传数量 N
+        "max_size": 100, // 单个上传文件的最大大小 KB N
+        "fileTypeStr": ["jpg", "png", "gif", "bmp", "jpeg"], // 允许上传的文件类型，例如支持的文档类型：["doc", "docx", "ppt", "pptx", "xls", "xlsx", "pdf", "txt"] N
+        "fileType": 1, // 上传的文件类型，1：图片，2：文档 N
+        "next_del_id": 0, // 下一个删除按钮的 id 编号 N
+        "del_uri": "", // 删除图片 uri M
+        "del_type": "POST", // 删除图片的请求方式 M
+        "del_data": {}, // 删除图片时传递的数据 M
+        "del_success": null, // 删除成功回调函数 M
+        "del_error": null, // 删除失败回调函数 M
+        "upload_uri": "", // 上传图片 uri M
+        "upload_data": {}, // 上传图片时传递的数据 M
+        "upload_success": null, // 上传成功回调函数 M
+        "upload_error": null, // 上传失败回调函数 M
+        "successMsg": null, // 成功消息提示函数 M
+        "errorMsg": null, // 错误消息提示函数 M
     };
 
     // 初始化当前实例配置
@@ -156,13 +156,13 @@ D7CFileUpload.prototype.getValueByKey = function(options, key) {
  * @param {Object} options  选项对象
  */
 D7CFileUpload.prototype.initFileList = function(options) {
-    let container = this.getValueByKey(options, "container");
+    let container = this.config["container"];
     let html = '<ul class="filelist">',
         num = 0, // 文件数量
         data = this.getValueByKey(options, "data");
     if (!$.isEmptyObject(data)) {
         num = data.length;
-        let keys = this.getValueByKey(options, "dataKey");
+        let keys = this.config["dataKey"];
 
         $.each(data, function(index, value) {
             html += '<li><span ' + keys[0] + '=\'' + value[keys[0]] + '\' ' + keys[1] + '=\'' + value[keys[1]] +
@@ -177,32 +177,32 @@ D7CFileUpload.prototype.initFileList = function(options) {
     html += '</ul>';
 
     // 追加模式，并且还可以继续追加
-    if (this.getValueByKey(options, "append") && this.getValueByKey(options, "max_num") > num) {
-        html += '<input type="file" name="' + this.getValueByKey(options, "name") + '" style="width: 0; height: 0;" />';
+    if (this.config["append"] && this.config["max_num"] > num) {
+        html += '<input type="file" name="' + this.config["name"] + '" style="width: 0; height: 0;" />';
         html += '<a class="choose_a"><i class="fa fa-plus fa-5x"></i></a>';
     }
     $("#" + container).append(html);
 
     // 给图片绑定删除事件
-    this.spanAddClick(options, container);
+    this.spanAddClick(options);
 
     // 给追加按钮添加点击事件
     this.appendButton(options);
 }
 
 // 给图片绑定删除事件
-D7CFileUpload.prototype.spanAddClick = function(options, container) {
+D7CFileUpload.prototype.spanAddClick = function(options) {
     let that = this;
-    let keys = that.getValueByKey(options, "dataKey");
-    $("#" + container + " ul li span").on("click", function() {
+    let keys = that.config["dataKey"];
+    $("#" + that.config["container"] + " ul li span").on("click", function() {
         that.deleteFile(this, $(this).attr(keys[0]), $(this).attr(keys[1]));
     });
 }
 
 // 给追加按钮添加点击事件
 D7CFileUpload.prototype.appendButton = function(options) {
-    let num = $("#" + this.getValueByKey(options, "container") + " > ul li").length;
-    if (this.getValueByKey(options, "append") && this.getValueByKey(options, "max_num") > num) {
+    let num = $("#" + this.config["container"] + " > ul li").length;
+    if (this.config["append"] && this.config["max_num"] > num) {
         // 文件列表末尾增加一个 input 内容改变事件
         this.appendInputChange(options);
         // 文件列表末尾增加一个模拟点击 input 的自定义按钮
@@ -213,7 +213,7 @@ D7CFileUpload.prototype.appendButton = function(options) {
 // 文件列表末尾增加一个 input 内容改变事件
 D7CFileUpload.prototype.appendInputChange = function(options) {
     let that = this;
-    let container = that.getValueByKey(options, "container");
+    let container = that.config["container"];
     $("#" + container + " > input[display!=none]").on("change", function() {
         // 获取当前容器配置参数
         let config = d7c_file_config_pool[container];
@@ -235,7 +235,7 @@ D7CFileUpload.prototype.appendInputChange = function(options) {
         }
 
         // 单次上传数量检测
-        let file_num = $('#' + container + ' input[name=' + this.name + ']').length;
+        let file_num = $('#' + container + ' input[name=' + that.config["name"] + ']').length;
         if (!config.async // 是否是异步请求，true 是
             &&
             file_num > Number(config.max_num)) {
@@ -270,7 +270,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
             return;
         }
 
-        let keys = that.getValueByKey(options, "dataKey");
+        let keys = that.config["dataKey"];
 
         /**
          * 通过 FormData 对象可以组装一组用  XMLHttpRequest 发送请求的键/值对。它可以更灵活方便的发送表单数据，因此可以独立于表单使用。
@@ -332,7 +332,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
  */
 D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     let that = this;
-    let container = that.getValueByKey(options, "container");
+    let container = that.config["container"];
 
     // 获取浏览器类型
     let browserVersion = window.navigator.userAgent.toUpperCase();
@@ -344,7 +344,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
      * 1、不是异步请求并且当前上传的文件数量小于单次请求允许上传的最大数量；
      * 2、是异步请求。
      */
-    let is_can_append = that.getValueByKey(options, "append") && (that.getValueByKey(options, "async") || file_num < Number(that.getValueByKey(options, "max_num")));
+    let is_can_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num < Number(that.config["max_num"]));
     if (is_can_append) {
         // 克隆追加按钮
         let _clone_this = $(_this).clone();
@@ -354,10 +354,9 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     }
 
     // 删除按钮的 id 编号
-    let next_del_id = container + '_span_' + that.next_del_id;
+    let next_del_id = container + '_span_' + that.config["next_del_id"];
     // 更新配置池中下一个删除按钮的 id 编号
-    d7c_file_config_pool[container]['next_del_id'] = that.next_del_id + 1;
-
+    d7c_file_config_pool[container]['next_del_id'] = next_del_id + 1;
 
     // 图片属性获取
     let _value = _this.value;
@@ -365,7 +364,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     // 获取图片本地预览 url
     let url = getFileUrl(_this);
 
-    let keys = this.getValueByKey(options, "dataKey");
+    let keys = that.config["dataKey"];
 
     let li = '<li><span id=\'' + next_del_id + '\' ';
     if (_this.files) { // HTML5实现预览，兼容 chrome、火狐 7+ 等
@@ -456,7 +455,7 @@ D7CFileUpload.prototype.successMsg = function(msg) {
 
 // 文件列表末尾增加一个模拟点击 input 的自定义按钮
 D7CFileUpload.prototype.appendInputClick = function(options) {
-    let container = this.getValueByKey(options, "container");
+    let container = this.config["container"];
     $("#" + container + " > a").on("click", function() {
         $("#" + container + " > input[display!=none]").click()
     });
