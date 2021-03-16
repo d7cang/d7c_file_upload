@@ -9,7 +9,20 @@
     </head>
     <body>
         <div style="width: 80%; height: 80%; margin: 0 auto; background: #CCCCCC;">
-            <div id="d7cFileContainer"></div>
+            <div id="d7cFileContainer" class="d7c-file-container">
+                <ul class="d7c-file-ul">
+                    <li class="d7c-file-li">
+                        <span class="d7c-file-del-span"><i class="d7c-file-del-icon"></i></span>
+                        <a class="d7c-file-a-img" onclick="window.open('./favicon.ico')"><img src="./favicon.ico" class="d7c-file-img" /></a>
+                    </li>
+                    <li class="d7c-file-li">
+                        <span class="d7c-file-del-span"><i class="d7c-file-del-icon"></i></span>
+                        <a class="d7c-file-a-img" onclick="window.open('./favicon.ico')"><img src="./favicon.ico" class="d7c-file-img" /></a>
+                    </li>
+                </ul>
+                <input type="file" name="file1" style="width: 0; height: 0;" />
+                <a class="d7c-file-a-choose"><i class="d7c-file-upload-icon"></i></a>
+            </div>
         </div>
         <script src="./lib/jquery/dist/jquery.min.js"></script>
         <!-- 自定义 d7c.file-upload 脚本 -->
