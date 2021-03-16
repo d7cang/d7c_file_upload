@@ -72,7 +72,7 @@ function getFileSize(target) {
  * @param {Object} _this	input 框对象
  */
 function getFileUrl(_this) {
-    var url = "#";
+    let url = "#";
     if (window.createObjectURL != undefined) {
         url = window.createObjectURL(_this.files[0]);
     } else if (window.URL != undefined) {
@@ -198,7 +198,7 @@ D7CFileUpload.prototype.spanAddClick = function(options) {
     let that = this;
     let keys = that.config["dataKey"];
     $("#" + that.config["container"] + " ul li span").on("click", function() {
-        that.deleteFile(this, $(this).attr(keys[0]), $(this).attr(keys[1]));
+        that.deleteFile(options, this, $(this).attr(keys[0]), $(this).attr(keys[1]));
     });
 }
 
@@ -294,7 +294,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
             processData: false, // 必须设置为 false 才会避开 jQuery 对 formdata 的默认处理，XMLHttpRequest 会对 formdata 进行正确的处理。
             success: function(result) {
                 if (result.status == 200) { // 上传成功
-                    // 画文档显示区域
+                    // 画图片显示区域
                     that.makePicture(options, _this, result.data[keys[0]]);
                 }
 
@@ -430,7 +430,128 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     }
 
     // 给 span 添加删除事件
-    that.deleteFile($("#" + container + " ul li span[" + container + "_span=" + next_del_id + "]"), fileId, filename);
+    that.deleteFile(options, $("#" + container + " ul li span[" + container + "_span=" + next_del_id + "]"), fileId, filename);
+
+    // 将当前 input 隐藏并设置删除 id
+    $(_this).attr('display', 'none').attr("del", next_del_id);
+}
+
+/**
+ * 选择文档
+ * @param {Object} options	容器配置参数
+ * @param {Object} _this	input 框对象
+ */
+D7CFileUpload.prototype.chooseDoc = function(options, _this) {
+    let that = this;
+
+    if (that.getValueByKey(options, "async")) { // 异步请求
+        // 上传文档 uri
+        let upload_uri = that.getValueByKey(options, "upload_uri");
+        if (isBlank(upload_uri)) {
+            that.errorMsg("上传文档 uri 为空，请配置 upload_uri 属性！");
+            return;
+        }
+
+        let keys = that.config["dataKey"];
+
+        /**
+         * 通过 FormData 对象可以组装一组用 XMLHttpRequest 发送请求的键/值对。它可以更灵活方便的发送表单数据，因此可以独立于表单使用。
+         * 如果把表单的编码类型设置为 multipart/form-data，则通过 FormData 传输的数据格式和表单通过 submit() 方法传输的数据格式相同。
+         */
+        let formData = new FormData();
+        formData.append(keys[2], _this.files[0]);
+        $.each(that.getValueByKey(options, "upload_data"), function(index, value) {
+            formData.append(index, value);
+        });
+
+        let callbacks = $.Callbacks();
+        $.ajax({
+            url: upload_uri,
+            type: "POST",
+            data: formData,
+            contentType: false, // 必须设置为 false 才会自动加上正确的 Content-Type。
+            processData: false, // 必须设置为 false 才会避开 jQuery 对 formdata 的默认处理，XMLHttpRequest 会对 formdata 进行正确的处理。
+            success: function(result) {
+                if (result.status == 200) { // 上传成功
+                    // 画文档显示区域
+                    that.makeDoc(options, _this, result.data[keys[0]]);
+                }
+
+                // 成功后回调执行
+                let upload_success = that.getValueByKey(options, "upload_success");
+                if (upload_success) {
+                    callbacks.add(upload_success);
+                    callbacks.fire(_this, result);
+                } else {
+                    if (result.status == 200) {
+                        that.successMsg("上传成功!");
+                    } else {
+                        that.errorMsg("上传失败!");
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // 失败后回调执行
+                let upload_error = that.getValueByKey(options, "upload_error");
+                if (upload_error) {
+                    callbacks.add(upload_error);
+                    callbacks.fire(_this, jqXHR, textStatus, errorThrown);
+                } else {
+                    that.errorMsg("服务器异常!");
+                }
+            }
+        });
+    } else {
+        that.makeDoc(options, _this, "");
+    }
+}
+
+/**
+ * 画文档显示区域
+ * @param {Object} options	容器配置参数
+ * @param {Object} _this	input 框对象
+ * @param {Object} fileId   文件在数据库中的主键
+ */
+D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
+    let container = that.config["container"];
+
+    // 获取浏览器类型
+    let browserVersion = window.navigator.userAgent.toUpperCase();
+
+    // 单次上传数量检测
+    let file_num = $('#' + container + ' input[name=' + _this.name + ']').length;
+    /**
+     * 是否显示追加文件按钮，必须在追加模式下：
+     * 1、不是异步请求并且当前上传的文件数量小于单次请求允许上传的最大数量；
+     * 2、是异步请求。
+     */
+    let is_can_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num < Number(that.config["max_num"]));
+    if (is_can_append) {
+        // 克隆追加按钮
+        let _clone_this = $(_this).clone();
+        clearInput(_clone_this, browserVersion);
+        // 将一个空的追加按钮放到容器最后
+        $(_clone_this).appendTo("#" + container);
+    }
+
+    // 删除按钮的 id 编号
+    let next_del_id = container + '_span_' + that.config['next_del_id'];
+    // 更新配置池中下一个删除按钮的 id 编号
+    d7c_file_config_pool[container]['next_del_id'] = next_del_id + 1;
+
+    // 画文档显示区域
+    let keys = that.config["dataKey"];
+    let filename = _this.files[0].name;
+    let li = '<li><span ' + container + '_span=\'' + next_del_id + '\' ';
+    li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\' ';
+    li +=
+        ' class=\'red\'><i class=\'ace-icon fa fa-trash-o bigger-130 red\'></i></span><a class="btn btn-light btn-xs" data-rel="colorbox"><i class="fa fa-cloud-upload fa-4x green"></i></a><p class="file-name">';
+    li += filename + '</p></li>';
+    // 将新生成的 li 追加到原 ul 后
+    $('#' + container + ' > ul').append(li);
+
+    // 给 span 添加删除事件
+    that.deleteFile(options, $("#" + container + " ul li span[" + container + "_span=" + next_del_id + "]"), fileId, filename);
 
     // 将当前 input 隐藏并设置删除 id
     $(_this).attr('display', 'none').attr("del", next_del_id);
@@ -466,15 +587,16 @@ D7CFileUpload.prototype.appendInputClick = function(options) {
 
 /**
  * 删除文件
+ * @param {Object} options	容器配置参数
  * @param {Object} _this	span 对象
  * @param {Object} id		文件在数据库中的主键
  * @param {Object} name		文件的名称
  */
-D7CFileUpload.prototype.deleteFile = function(_this, id, name) {
+D7CFileUpload.prototype.deleteFile = function(options, _this, id, name) {
     if (isBlank(id)) { // 本地删除
-        this.deleteLocalFile(_this, id, name);
+        this.deleteLocalFile(options, _this, id, name);
     } else { // 即从本地删除，也要从服务端删除
-        this.deleteServerFile(_this, id, name);
+        this.deleteServerFile(options, _this, id, name);
     }
 }
 
@@ -484,7 +606,7 @@ D7CFileUpload.prototype.deleteFile = function(_this, id, name) {
  * @param {Object} id		文件在数据库中的主键
  * @param {Object} name		文件的名称
  */
-D7CFileUpload.prototype.deleteLocalFile = function(_this, id, name) {
+D7CFileUpload.prototype.deleteLocalFile = function(options, _this, id, name) {
     let container = this.config["container"];
     // 获取 span 标签上绑定的 container + "_span" 属性值
     let container_span = $(_this).attr(container + "_span");
@@ -510,37 +632,36 @@ D7CFileUpload.prototype.deleteLocalFile = function(_this, id, name) {
  * @param {Object} id		文件在数据库中的主键
  * @param {Object} name		文件的名称
  */
-D7CFileUpload.prototype.deleteServerFile = function(_this, id, name) {
+D7CFileUpload.prototype.deleteServerFile = function(options, _this, id, name) {
     let that = this;
     let container = that.config["container"];
-    // 获取当前容器配置参数
-    var config = d7c_file_config_pool[container];
 
     // 删除图片 uri
-    var del_uri = config.del_uri;
+    let del_uri = that.getValueByKey(options, "del_uri");
     if (isBlank(del_uri)) {
         that.errorMsg("删除图片 uri 为空，请配置 del_uri 属性！");
         return;
     }
-    var keys = config.dataKey;
-    var callbacks = $.Callbacks();
+    let keys = that.config.dataKey;
+    let callbacks = $.Callbacks();
 
     // 获取当前要删除对象的 li 对象
-    var $li = $(_this).parent("li");
+    let $li = $(_this).parent("li");
     // ajax 请求删除文件
-    if ("POST" == config.del_type.toLowerCase()) { // POST 请求
-        var del_data = config.del_data;
+    let del_type = that.getValueByKey(options, "del_type");
+    if ("POST" == del_type.toLowerCase()) { // POST 请求
+        let del_data = that.getValueByKey(options, "del_data");
         del_data[keys[0]] = id;
         del_data[keys[1]] = name;
         $.ajax({
-            type: config.del_type,
+            type: del_type,
             data: del_data,
             url: del_uri,
             async: true,
             success: function(result) {
                 if (result.status == 200) { // 删除成功
                     // 删除页面未上传的文件
-                    that.deleteLocalFile(_this, id, name);
+                    that.deleteLocalFile(options, _this, id, name);
                 }
 
                 // 成功后回调执行
@@ -568,11 +689,11 @@ D7CFileUpload.prototype.deleteServerFile = function(_this, id, name) {
             }
         });
     } else { // 使用 GET 请求
-        var url = del_uri + '?' + keys[0] + '=' + id + '&' + keys[1] + '=' + name + '&tm=' + new Date().getTime();
+        let url = del_uri + '?' + keys[0] + '=' + id + '&' + keys[1] + '=' + name + '&tm=' + new Date().getTime();
         $.get(url, function(result) {
             if (result.status == 200) { // 删除成功
                 // 删除页面未上传的文件
-                that.deleteLocalFile(_this, id, name);
+                that.deleteLocalFile(options, _this, id, name);
             }
 
             // 成功后回调执行
