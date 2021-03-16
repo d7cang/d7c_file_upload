@@ -6,22 +6,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <title>d7c_file_upload 插件测试样例入口</title>
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="stylesheet" href="./css/d7c.file-upload.min.css" />
     </head>
     <body>
-        <div style="width: 80%; height: 80%; margin: 0 auto; background: #CCCCCC;">
+        <div style="width: 80%; height: 80%; margin: 0 auto; border: 1px solid red">
             <div id="d7cFileContainer" class="d7c-file-container">
                 <ul class="d7c-file-ul">
                     <li class="d7c-file-li">
-                        <span class="d7c-file-del-span"><i class="d7c-file-del-icon"></i></span>
-                        <a class="d7c-file-a-img" onclick="window.open('./favicon.ico')"><img src="./favicon.ico" class="d7c-file-img" /></a>
+                        <span class="d7c-file-del-span">删除<i class="d7c-file-del-icon"></i></span>
+                        <a class="d7c-file-a" onclick="window.open('./images/d7c.png')">
+                            <img src="./images/d7c.png" class="d7c-file-img" />
+                            <span class="d7c-file-text-span">第七仓 LOGO</span>
+                        </a>
                     </li>
                     <li class="d7c-file-li">
                         <span class="d7c-file-del-span"><i class="d7c-file-del-icon"></i></span>
-                        <a class="d7c-file-a-img" onclick="window.open('./favicon.ico')"><img src="./favicon.ico" class="d7c-file-img" /></a>
+                        <a class="d7c-file-a" onclick="window.open('./images/weixingzh.jpg')">
+                            <img src="./images/weixingzh.jpg" class="d7c-file-img" />
+                            <span class="d7c-file-text-span">微信公众号</span>
+                        </a>
+                    </li>
+                    <li class="d7c-file-li">
+                        <span class="d7c-file-del-span"><i class="d7c-file-del-icon"></i></span>
+                        <a class="d7c-file-a" onclick="window.open('./images/taobao.png')">
+                            <img src="./images/taobao.png" class="d7c-file-img" />
+                            <span class="d7c-file-text-span">淘宝店铺地址</span>
+                        </a>
                     </li>
                 </ul>
                 <input type="file" name="file1" style="width: 0; height: 0;" />
-                <a class="d7c-file-a-choose"><i class="d7c-file-upload-icon"></i></a>
+                <a class="d7c-file-a-choose"><i class="d7c-file-choose-icon">追加按钮</i></a>
             </div>
         </div>
         <script src="./lib/jquery/dist/jquery.min.js"></script>
@@ -41,8 +55,8 @@
                     uri: "uri2"
                 }]
             };
-            let d7cFile = new D7CFileUpload(options);
-            d7cFile.initFileList();
+            //let d7cFile = new D7CFileUpload(options);
+            //d7cFile.initFileList();
         </script>
     </body>
 </html>

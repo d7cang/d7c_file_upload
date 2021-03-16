@@ -6,37 +6,99 @@
     height: 100%;
     margin: 0px;
     padding: 0px;
+    display: inline-block;
     ul {
+        list-style: outside none none;
+        padding: 0px 15px;
         li {
-            span {
+            display: inline;
+            position: relative;
+            float: left;
+            overflow: hidden;
+            text-align: center;
+            border: 1px solid #cccccc;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 5px 5px;
+            span:first-child {
+                position: absolute;
+                z-index: 3;
+                top: 0px;
+                right: 0px;
+                padding: 0 2px;
+                color: #ff0000;
+                cursor: pointer;
                 i {
                 }
             }
             a {
+                display: block;
+                position: relative;
+                overflow: hidden;
+                vertical-align: middle;
+                z-index: 2;
+                width: 120px;
+                line-height: 150px;
+                height: 150px;
+                transform-origin: 50% 50% 0;
+                transition: all 200ms ease-out 0s;
+                cursor: pointer;
                 img {
+                    width: 100%;
+                }
+                i {
+                }
+                span {
+                    position: absolute;
+                    margin: 0px 12px;
+                    z-index: 3;
+                    bottom: 0px;
+                    right: 0px;
+                    width: 80%;
+                    height: 30px;
+                    line-height: 30px;
+                    color: #696969;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    // background-color: rgba(0, 0, 0, .5);
                 }
             }
         }
     }
-    input {
-    }
-    a {
-    }
+    // 样式覆盖
     .d7c-file-ul {
         .d7c-file-li {
             .d7c-file-del-span {
                 .d7c-file-del-icon {
                 }
             }
-            .d7c-file-a-img {
-                .d7c-file-img {
+            .d7c-file-a {
+                .d7c-file-doc-icon {
+                }
+                .d7c-file-text-span {
                 }
             }
         }
     }
     .d7c-file-a-choose {
-        .d7c-file-upload-icon {
+        display: inline-block;
+        text-decoration: none;
+        cursor: pointer;
+        width: 120px;
+        height: 150px;
+        color: #cccccc;
+        text-align: center;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        margin: 5px 2px;
+        .d7c-file-choose-icon {
         }
+    }
+    .d7c-file-a-choose:hover,
+    .d7c-file-a-choose:link,
+    .d7c-file-a-choose:active {
+        background: #dcdcdc;
     }
 }
 
