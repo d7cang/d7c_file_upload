@@ -263,6 +263,11 @@ D7CFileUpload.prototype.appendInputChange = function(options) {
 D7CFileUpload.prototype.choosePicture = function(options, _this) {
     let that = this;
 
+    if (!_this) {
+        that.errorMsg("请先选择图片！");
+        return;
+    }
+
     // 异步请求
     let async = that.getValueByKey(options, "async");
     if (async) {
@@ -335,6 +340,12 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
  */
 D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     let that = this;
+
+    if (!_this) {
+        that.errorMsg("请先选择图片！");
+        return;
+    }
+
     let container = that.config["container"];
 
     // 获取浏览器类型
@@ -361,8 +372,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     // 更新配置池中下一个删除按钮的 id 编号
     d7c_file_config_pool[container]['next_del_id'] = next_del_id + 1;
 
-    // 图片属性获取
-    let _value = _this.value;
+    // 获取图片名称
     let filename = _this.files[0].name;
     // 获取图片本地预览 url
     let url = getFileUrl(_this);
@@ -385,6 +395,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
             that.errorMsg('不支持 Safari6.0 以下浏览器的图片预览!');
         }
     } else {
+        let _value = _this.value;
         if (browserVersion.indexOf("MSIE") > -1) {
             if (browserVersion.indexOf("MSIE 6") > -1) { // ie6
                 li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\' ';
@@ -443,6 +454,11 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
  */
 D7CFileUpload.prototype.chooseDoc = function(options, _this) {
     let that = this;
+
+    if (!_this) {
+        that.errorMsg("请先选择文档！");
+        return;
+    }
 
     if (that.getValueByKey(options, "async")) { // 异步请求
         // 上传文档 uri
@@ -513,6 +529,13 @@ D7CFileUpload.prototype.chooseDoc = function(options, _this) {
  * @param {Object} fileId   文件在数据库中的主键
  */
 D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
+    let that = this;
+
+    if (!_this) {
+        that.errorMsg("请先选择文档！");
+        return;
+    }
+
     let container = that.config["container"];
 
     // 获取浏览器类型
@@ -607,6 +630,11 @@ D7CFileUpload.prototype.deleteFile = function(options, _this, id, name) {
  * @param {Object} name		文件的名称
  */
 D7CFileUpload.prototype.deleteLocalFile = function(options, _this, id, name) {
+    if (!_this) {
+        this.errorMsg("请选择删除对象！");
+        return;
+    }
+
     let container = this.config["container"];
     // 获取 span 标签上绑定的 container + "_span" 属性值
     let container_span = $(_this).attr(container + "_span");
@@ -634,6 +662,12 @@ D7CFileUpload.prototype.deleteLocalFile = function(options, _this, id, name) {
  */
 D7CFileUpload.prototype.deleteServerFile = function(options, _this, id, name) {
     let that = this;
+
+    if (!_this) {
+        that.errorMsg("请选择删除对象！");
+        return;
+    }
+
     let container = that.config["container"];
 
     // 删除图片 uri
@@ -710,4 +744,83 @@ D7CFileUpload.prototype.deleteServerFile = function(options, _this, id, name) {
             }
         });
     }
-};
+}
+
+/**
+ * 在 img 标签中显示 input 标签中的图片内容
+ * @param {Object} options		容器配置参数
+ * @param {Object} _this		input 文件框对象（document 或 jQuery 对象）
+ * @param {Object} imgContainer	画 img 标签的容器（document 或 jQuery 对象）
+ * @param {Object} callBack		回调函数
+ */
+D7CFileUpload.prototype.showImages = function(options, _this, imgContainer, callBack) {
+    let that = this;
+
+    // 错误消息
+    let msg = null;
+
+    if (!_this) {
+        msg = '请先选择文档！';
+        if (callBack) {
+            callBack(msg);
+        } else {
+            that.errorMsg(msg);
+        }
+        return;
+    }
+
+    let img = '<img ' + that.getValueByKey(options, "img_style") + ' src=\'';
+    if (_this.files) { // HTML5 实现预览，兼容 chrome、火狐 7+ 等
+        if (window.FileReader) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                img += e.target.result + '\' />';
+                $(imgContainer).append(img);
+            };
+            reader.readAsDataURL(_this.files[0]);
+        } else { // browserVersion.indexOf("SAFARI") > -1
+            msg = '不支持 Safari6.0 以下浏览器的图片预览!';
+            if (callBack) {
+                callBack(msg);
+            } else {
+                that.errorMsg(msg);
+            }
+            return;
+        }
+    } else {
+        // 获取浏览器类型
+        let browserVersion = window.navigator.userAgent.toUpperCase();
+        let _value = _this.value;
+        if (browserVersion.indexOf("MSIE") > -1) {
+            if (browserVersion.indexOf("MSIE 6") > -1) { // ie6
+                img += _value + '\' />';
+                $(imgContainer).append(img);
+            } else { // ie[7-9]
+                _this.select();
+                if (browserVersion.indexOf("MSIE 9") > -1) {
+                    _this.blur(); // 不加 document.selection.createRange().text，在 ie9 中会拒绝访问
+                }
+                img += '\' />';
+                let $img = $("#" + img);
+                $img.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale',src='" + document.selection.createRange().text + "')";
+                let $img_temp = $("#" + img);
+                $img.parentNode.insertBefore($img, $img_temp);
+                $img.style.display = "none";
+                $(imgContainer).append($img_temp);
+            }
+        } else if (browserVersion.indexOf("FIREFOX") > -1) { // firefox
+            let firefoxVersion = parseFloat(browserVersion.toLowerCase().match(/firefox\/([\d.]+)/)[1]);
+            if (firefoxVersion < 7) { // firefox7 以下版本
+                img += _this.files[0].getAsDataURL() + '\' />';
+            } else { // firefox7.0+
+                img += window.URL.createObjectURL(_this.files[0]) + '\' />';
+            }
+            $(imgContainer).append(img);
+        } else {
+            img += _value + '\' />';
+            $(imgContainer).append(img);
+        }
+    }
+}
+
+;
