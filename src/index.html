@@ -49,18 +49,50 @@
                 "container": "d7cFileContainer1",
                 "append": true,
                 "data": [{
-                    id: 1,
+                    id1: 1,
                     name: "第七仓 LOGO",
                     uri: "./images/d7c.png"
                 }, {
-                    id: 2,
+                    id1: 2,
                     name: "微信公众号",
                     uri: "./images/weixingzh.jpg"
                 }, {
-                    id: 3,
+                    id1: 3,
                     name: "淘宝店铺地址",
                     uri: "./images/taobao.png"
-                }]
+                }],
+                "name": "d7cfile1",
+                "dataKey": ['id1', 'name1', 'uri'], // 数据 json 中的键值
+                "max_num": 4,
+                // 删除
+                "del_uri": "127.0.0.1:8080/d7c/file/deluri",
+                "del_data": {
+                    idxxx: 9999
+                },
+                "del_success": function(_this, result) {
+                    console.log("删除成功~~~~~~")
+                },
+                "del_error": function(jqXHR, textStatus, errorThrown) {
+                    console.log("删除失败~~~~~~")
+                },
+                // 上传
+                "upload_uri": "127.0.0.1:8080/d7c/file/uploaduri",
+                "upload_data": {
+                    filetype: "图片"
+                },
+                "upload_success": function(_this, result) {
+                    console.log("上传成功~~~~~~")
+                },
+                "upload_error": function(jqXHR, textStatus, errorThrown) {
+                    console.log("上传失败~~~~~~")
+                },
+                // 默认消息函数
+                "successMsg": function(msg) {
+                    console.log(msg);
+                },
+                "errorMsg": function(msg) {
+                    console.error(msg);
+                }
             };
             let d7cFile1 = new D7CFileUpload(options);
             d7cFile1.initFileList();
