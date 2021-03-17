@@ -11,54 +11,59 @@
     <body>
         <h1 align="center">第七仓 d7c_file_upload 插件测试样例</h1>
         <div style="width: 80%; height: 80%; margin: 0 auto; border: 1px solid red">
-            <div id="d7cFileContainer" class="d7c-file-container">
+            <div id="d7cFileContainer0" class="d7c-file-container">
                 <ul class="d7c-file-ul">
                     <li class="d7c-file-li">
                         <span class="d7c-file-del-span"><i class="d7c-file-icon-bin"></i></span>
-                        <a class="d7c-file-a" onclick="window.open('./images/d7c.png')">
-                            <img src="./images/d7c.png" class="d7c-file-img" />
+                        <a class="d7c-file-a">
+                            <img src="./images/d7c.png" class="d7c-file-img" onclick="window.open('./images/d7c.png')" />
                             <span class="d7c-file-text-span">第七仓 LOGO</span>
                         </a>
                     </li>
                     <li class="d7c-file-li">
                         <span class="d7c-file-del-span"><i class="d7c-file-icon-bin"></i></span>
-                        <a class="d7c-file-a" onclick="window.open('./images/weixingzh.jpg')">
-                            <img src="./images/weixingzh.jpg" class="d7c-file-img" />
+                        <a class="d7c-file-a">
+                            <img src="./images/weixingzh.jpg" class="d7c-file-img" onclick="window.open('./images/weixingzh.jpg')" />
                             <span class="d7c-file-text-span">微信公众号</span>
                         </a>
                     </li>
                     <li class="d7c-file-li">
                         <span class="d7c-file-del-span"><i class="d7c-file-icon-bin"></i></span>
-                        <a class="d7c-file-a" onclick="window.open('./images/taobao.png')">
-                            <img src="./images/taobao.png" class="d7c-file-img" />
+                        <a class="d7c-file-a">
+                            <img src="./images/taobao.png" class="d7c-file-img" onclick="window.open('./images/taobao.png')" />
                             <span class="d7c-file-text-span">淘宝店铺地址</span>
                         </a>
                     </li>
                 </ul>
                 <input type="file" name="file1" style="width: 0; height: 0;" />
-                <a class="d7c-file-a-choose"><i class="d7c-file-choose-icon">追加按钮</i></a>
+                <a class="d7c-file-a-choose"><i class="d7c-file-icon-cloud-upload"></i></a>
             </div>
             <hr style="border:1px dotted #A9A9A9" />
+            <div id="d7cFileContainer1" class="d7c-file-container"></div>
         </div>
         <script src="./lib/jquery/dist/jquery.min.js"></script>
         <!-- 自定义 d7c.file-upload 脚本 -->
         <script src="./js/d7c.file-upload.min.js"></script>
         <script type="text/javascript">
             let options = {
-                "container": "d7cFileContainer",
+                "container": "d7cFileContainer1",
                 "append": true,
                 "data": [{
                     id: 1,
-                    name: "name1",
-                    uri: "uri1"
+                    name: "第七仓 LOGO",
+                    uri: "./images/d7c.png"
                 }, {
                     id: 2,
-                    name: "name2",
-                    uri: "uri2"
+                    name: "微信公众号",
+                    uri: "./images/weixingzh.jpg"
+                }, {
+                    id: 3,
+                    name: "淘宝店铺地址",
+                    uri: "./images/taobao.png"
                 }]
             };
-            //let d7cFile = new D7CFileUpload(options);
-            //d7cFile.initFileList();
+            let d7cFile1 = new D7CFileUpload(options);
+            d7cFile1.initFileList();
         </script>
     </body>
 </html>
