@@ -49,6 +49,10 @@ const paths = {
             src: 'node_modules/jquery/dist/*.*',
             dest: 'dist/lib/jquery/dist/'
         },
+        {
+            src: 'src/icomoon/**/*.*',
+            dest: 'dist/icomoon/'
+        },
     ],
     base_src: 'src', // 资源父目录
     base_dest: 'dist', // 目标父目录
