@@ -161,12 +161,9 @@ D7CFileUpload.prototype.getValueByKey = function(options, key) {
 D7CFileUpload.prototype.initFileList = function(options) {
     let container = this.config["container"];
     let html = '<ul class=\'d7c-file-ul\'>',
-        num = 0, // 文件数量
         data = this.getValueByKey(options, "data");
     if (!$.isEmptyObject(data)) {
-        num = data.length;
         let keys = this.config["dataKey"];
-
         $.each(data, function(index, value) {
             html += '<li class=\'d7c-file-li\'>';
             html += '<span class=\'d7c-file-del-span\' ' + keys[0] + '=\'' + value[keys[0]] + '\' ' +
@@ -182,7 +179,7 @@ D7CFileUpload.prototype.initFileList = function(options) {
     html += '</ul>';
 
     // 追加模式，并且还可以继续追加
-    if (this.config["append"] && this.config["max_num"] > num) {
+    if (this.config["append"] && (this.getValueByKey(options, "async") || this.config["max_num"] > 0)) {
         html += '<input type=\'file\' name=\'' + this.config["name"] + '\' style=\'width: 0; height: 0;\' />';
         html += '<a class=\'d7c-file-a-choose\'><i class=\'d7c-file-icon-cloud-upload\'></i></a>';
     }
@@ -199,15 +196,15 @@ D7CFileUpload.prototype.initFileList = function(options) {
 D7CFileUpload.prototype.spanAddClick = function(options) {
     let that = this;
     let keys = that.config["dataKey"];
-    $("#" + that.config["container"] + " ul li span").on("click", function() {
+    $("#" + that.config["container"]).delegate(" > ul > li > span", "click", function() {
         that.deleteFile(options, this, $(this).attr(keys[0]), $(this).attr(keys[1]));
     });
 }
 
 // 给追加按钮添加点击事件
 D7CFileUpload.prototype.appendButton = function(options) {
-    let num = $("#" + this.config["container"] + " > ul li").length;
-    if (this.config["append"] && this.config["max_num"] > num) {
+    let num = $('#' + this.config["container"] + ' > input[display=none]').length;
+    if (this.config["append"] && (this.getValueByKey(options, "async") || this.config["max_num"] > num)) {
         // 文件列表末尾增加一个 input 内容改变事件
         this.appendInputChange(options);
         // 文件列表末尾增加一个模拟点击 input 的自定义按钮
@@ -219,7 +216,7 @@ D7CFileUpload.prototype.appendButton = function(options) {
 D7CFileUpload.prototype.appendInputChange = function(options) {
     let that = this;
     let container = that.config["container"];
-    $("#" + container + " > input[display!=none]").on("change", function() {
+    $("#" + container).delegate(" > input[display!=none]", "change", function() {
         // 获取当前容器配置参数
         let config = d7c_file_config_pool[container];
         // 获取浏览器类型
@@ -354,7 +351,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     let browserVersion = window.navigator.userAgent.toUpperCase();
 
     // 单次上传数量检测
-    let file_num = $('#' + container + ' input[name=' + _this.name + ']').length;
+    let file_num = $('#' + container + ' > input[display=none]').length;
     /**
      * 是否显示追加文件按钮，必须在追加模式下：
      * 1、不是异步请求并且当前上传的文件数量小于单次请求允许上传的最大数量；
@@ -397,6 +394,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
             reader.readAsDataURL(_this.files[0]);
         } else { // browserVersion.indexOf("SAFARI") > -1
             that.errorMsg('不支持 Safari6.0 以下浏览器的图片预览!');
+            return;
         }
     } else {
         let _value = _this.value;
@@ -453,11 +451,14 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
         }
     }
 
-    // 给 span 添加删除事件
-    that.deleteFile(options, $("#" + container + " ul li span[" + container + "_span=" + next_del_id + "]"), fileId, filename);
-
     // 将当前 input 隐藏并设置删除 id
     $(_this).attr('display', 'none').attr("del", next_del_id);
+
+    // 隐藏追加按钮
+    let is_show_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num + 1 >= Number(that.config["max_num"]));
+    if (is_show_append) {
+        $('#' + container + ' > a').hide();
+    }
 }
 
 /**
@@ -555,7 +556,7 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
     let browserVersion = window.navigator.userAgent.toUpperCase();
 
     // 单次上传数量检测
-    let file_num = $('#' + container + ' input[name=' + _this.name + ']').length;
+    let file_num = $('#' + container + ' > input[display=none]').length;
     /**
      * 是否显示追加文件按钮，必须在追加模式下：
      * 1、不是异步请求并且当前上传的文件数量小于单次请求允许上传的最大数量；
@@ -586,11 +587,14 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
     // 将新生成的 li 追加到原 ul 后
     $('#' + container + ' > ul').append(li);
 
-    // 给 span 添加删除事件
-    that.deleteFile(options, $("#" + container + " ul li span[" + container + "_span=" + next_del_id + "]"), fileId, filename);
-
     // 将当前 input 隐藏并设置删除 id
     $(_this).attr('display', 'none').attr("del", next_del_id);
+
+    // 隐藏追加按钮
+    let is_show_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num + 1 >= Number(that.config["max_num"]));
+    if (is_show_append) {
+        $('#' + container + ' > a').hide();
+    }
 }
 
 // 错误消息提示
@@ -665,6 +669,11 @@ D7CFileUpload.prototype.deleteLocalFile = function(options, _this, id, name) {
     let $li = $(_this).parent("li");
     // 删除 li
     $li.remove();
+
+    // 如果没有显示对象时调节样式
+    if ($("#" + container + " > ul > li").length == 0) {
+        $("#" + container + " > a").css("margin-left", "10px");
+    }
 }
 
 /**

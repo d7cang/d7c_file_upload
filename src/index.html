@@ -48,6 +48,7 @@
             let options = {
                 "container": "d7cFileContainer1",
                 "append": true,
+                "async": false,
                 "data": [{
                     id1: 1,
                     name1: "第七仓 LOGO",
@@ -63,9 +64,10 @@
                 }],
                 "name": "d7cfile1",
                 "dataKey": ['id1', 'name1', 'uri'], // 数据 json 中的键值
-                "max_num": 4,
+                "max_num": 2,
                 // 删除
                 "del_uri": "127.0.0.1:8080/d7c/file/deluri",
+                "del_type": "GET",
                 "del_data": {
                     idxxx: 9999
                 },
