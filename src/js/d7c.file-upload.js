@@ -696,7 +696,7 @@ D7CFileUpload.prototype.deleteServerFile = function(options, _this, id, name) {
     let $li = $(_this).parent("li");
     // ajax 请求删除文件
     let del_type = that.getValueByKey(options, "del_type");
-    if ("POST" == del_type.toLowerCase()) { // POST 请求
+    if ("POST" == del_type.toLocaleUpperCase()) { // POST 请求
         let del_data = that.getValueByKey(options, "del_data");
         del_data[keys[0]] = id;
         del_data[keys[1]] = name;
