@@ -1,0 +1,14 @@
+/**
+ * 公共样式
+ */
+.clearfix:before,
+.clearfix:after {
+    content: "";
+    display: table; /* 这句话可以触发 BFC，BFC 可以清除浮动 */
+}
+.clearfix:after {
+    clear: both;
+}
+.clearfix {
+    *zoom: 1;
+}
