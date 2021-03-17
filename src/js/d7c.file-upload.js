@@ -170,7 +170,7 @@ D7CFileUpload.prototype.initFileList = function(options) {
         $.each(data, function(index, value) {
             html += '<li class=\'d7c-file-li\'>';
             html += '<span class=\'d7c-file-del-span\' ' + keys[0] + '=\'' + value[keys[0]] + '\' ' +
-                keys[1] + '=\'' + value[keys[1]] + '\'><i class=\'d7c-file-del-icon\'></i></span>';
+                keys[1] + '=\'' + value[keys[1]] + '\'><i class=\'d7c-file-icon-bin\'></i></span>';
             html += '<a class=\'d7c-file-a\' onclick="window.open(\'' + value[keys[2]] + '\')">';
             html += '<img class=\'d7c-file-img\' src=\'' + value[keys[2]] + '\' />';
             html += '<span class=\'d7c-file-text-span\'>' + value[keys[1]] + '</span></a></li>';
@@ -387,7 +387,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
             let reader = new FileReader();
             reader.onload = function(e) {
                 li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
-                li += '<i class=\'d7c-file-del-icon\'></i></span>';
+                li += '<i class=\'d7c-file-icon-bin\'></i></span>';
                 li += '<a class=\'d7c-file-a\' onclick="window.open(\'' + url + '\')">';
                 li += '<img class=\'d7c-file-img\' src=\'' + e.target.result + '\' />';
                 li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
@@ -403,7 +403,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
         if (browserVersion.indexOf("MSIE") > -1) {
             if (browserVersion.indexOf("MSIE 6") > -1) { // ie6
                 li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
-                li += '<i class=\'d7c-file-del-icon\'></i></span>';
+                li += '<i class=\'d7c-file-icon-bin\'></i></span>';
                 li += '<a class=\'d7c-file-a\' onclick="window.open(\'' + url + '\')">';
                 li += '<img class=\'d7c-file-img\' src=\'' + _value + '\' />';
                 li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
@@ -415,7 +415,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
                     _this.blur(); // 不加 document.selection.createRange().text，在 ie9 中会拒绝访问
                 }
                 li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
-                li += '<i class=\'d7c-file-del-icon\'></i></span>';
+                li += '<i class=\'d7c-file-icon-bin\'></i></span>';
                 li += '<a class=\'d7c-file-a\' onclick="window.open(\'' + url + '\')">';
                 li += '<img class=\'d7c-file-img\' /><span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
                 let $li = $("#" + li);
@@ -429,7 +429,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
         } else if (browserVersion.indexOf("FIREFOX") > -1) { // firefox
             let firefoxVersion = parseFloat(browserVersion.toLowerCase().match(/firefox\/([\d.]+)/)[1]);
             li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
-            li += '<i class=\'d7c-file-del-icon\'></i></span>';
+            li += '<i class=\'d7c-file-icon-bin\'></i></span>';
             li += '<a class=\'d7c-file-a\' onclick="window.open(\'' + url + '\')">';
             li += '<img class=\'d7c-file-img\' src=\'';
             if (firefoxVersion < 7) { // firefox7 以下版本
@@ -442,7 +442,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
             $('#' + container + ' > ul').append(li);
         } else {
             li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
-            li += '<i class=\'d7c-file-del-icon\'></i></span>';
+            li += '<i class=\'d7c-file-icon-bin\'></i></span>';
             li += '<a class=\'d7c-file-a\' onclick="window.open(\'' + url + '\')">';
             li += '<img class=\'d7c-file-img\' src=\'' + _value + '\' />';
             li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
@@ -578,7 +578,7 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
     let filename = _this.files[0].name;
     let li = '<li class=\'d7c-file-li\'>';
     li += '<span class=\'d7c-file-del-span\' ' + container + '_span=\'' + next_del_id + '\' ' + keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
-    li += '<i class=\'d7c-file-del-icon\'></i></span>';
+    li += '<i class=\'d7c-file-icon-bin\'></i></span>';
     li += '<a class=\'d7c-file-a\'><i class=\'d7c-file-doc-icon\'></i>';
     li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
     // 将新生成的 li 追加到原 ul 后
