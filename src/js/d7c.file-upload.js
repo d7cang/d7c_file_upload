@@ -831,10 +831,8 @@ D7CFileUpload.prototype.deleteServerFile = function(options, _this, id, name) {
  */
 D7CFileUpload.prototype.showImages = function(options, _this, imgContainer, callBack) {
     let that = this;
-
     // 错误消息
     let msg = null;
-
     if (!_this) {
         msg = '请先选择文档！';
         if (callBack) {
