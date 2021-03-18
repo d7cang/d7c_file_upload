@@ -663,7 +663,6 @@ D7CFileUpload.prototype.deleteLocalFile = function(options, _this, id, name) {
     if (!isBlank(container_span)) {
         // 获取 input 框上 del 属性的值为 container_span 的 input 对象
         let $input = $("#" + container + " > ul > input[del=" + container_span + "]");
-
         // 清空 input 框文件内容
         clearInput($input, window.navigator.userAgent.toUpperCase());
         // 删除 input 框
@@ -697,8 +696,6 @@ D7CFileUpload.prototype.deleteServerFile = function(options, _this, id, name) {
         return;
     }
 
-    let container = that.config["container"];
-
     // 删除图片 uri
     let del_uri = that.getValueByKey(options, "del_uri");
     if (isBlank(del_uri)) {
@@ -708,8 +705,6 @@ D7CFileUpload.prototype.deleteServerFile = function(options, _this, id, name) {
     let keys = that.config.dataKey;
     let callbacks = $.Callbacks();
 
-    // 获取当前要删除对象的 li 对象
-    let $li = $(_this).parent("li");
     // ajax 请求删除文件
     let del_type = that.getValueByKey(options, "del_type");
     if ("POST" == del_type.toLocaleUpperCase()) { // POST 请求
