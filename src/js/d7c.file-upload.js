@@ -18,6 +18,30 @@ function isNotBlank(obj) {
 }
 
 /**
+ * 获取文件名。
+ * 需要写兼容代码！！！！！！！
+ * @param {Object} target   input 文件框对象
+ */
+function getFilename(target) {
+    if (!target) {
+        return "";
+    }
+    return target.files[0].name;
+}
+
+/**
+ * 获取文件对象。
+ * 需要写兼容代码！！！！！！！
+ * @param {Object} target   input 文件框对象
+ */
+function getFile(target) {
+    if (!target) {
+        return null;
+    }
+    return target.files[0];
+}
+
+/**
  * 获取文件扩展名（类型）
  * @param {Object} filename	文件名
  */
@@ -73,32 +97,32 @@ function getFileSize(target) {
 
 /**
  * 获取图片本地预览 url
- * @param {Object} _this	input 框对象
+ * @param {Object} target	input 框对象
  */
-function getFileUrl(_this) {
+function getFileUrl(target) {
     let url = "#";
     if (window.createObjectURL != undefined) {
-        url = window.createObjectURL(_this.files[0]);
+        url = window.createObjectURL(target.files[0]);
     } else if (window.URL != undefined) {
-        url = window.URL.createObjectURL(_this.files[0]);
+        url = window.URL.createObjectURL(target.files[0]);
     } else if (window.webkitURL != undefined) {
-        url = window.webkitURL.createObjectURL(_this.files[0]);
+        url = window.webkitURL.createObjectURL(target.files[0]);
     }
     return url;
 }
 
 /**
  * 清空 input 框文件内容
- * @param {Object} _this
+ * @param {Object} target
  */
-function clearInput(_this) {
-    _this.value = "";
+function clearInput(target) {
+    target.value = "";
     if (browserVersion.indexOf("MSIE") > -1) {
-        _this.select();
+        target.select();
         document.selection.clear();
     }
     // 重新初始化 input 框的 html
-    _this.outerHTML = _this.outerHTML;
+    target.outerHTML = target.outerHTML;
 }
 
 // 配置池，单页面可以创建多个实例
@@ -167,14 +191,24 @@ D7CFileUpload.prototype.initFileList = function(options) {
         data = this.getValueByKey(options, "data");
     if (!$.isEmptyObject(data)) {
         let keys = this.config["dataKey"];
-        $.each(data, function(index, value) {
-            html += '<li class=\'d7c-file-li\'>';
-            html += '<span class=\'d7c-file-del-span\' ' + keys[0] + '=\'' + value[keys[0]] + '\' ' +
-                keys[1] + '=\'' + value[keys[1]] + '\'><i class=\'d7c-file-icon-bin\'></i></span>';
-            html += '<a class=\'d7c-file-a\'>';
-            html += '<img class=\'d7c-file-img\' src=\'' + value[keys[2]] + '\' onclick="window.open(\'' + value[keys[2]] + '\')"/>';
-            html += '<span class=\'d7c-file-text-span\'>' + value[keys[1]] + '</span></a></li>';
-        });
+        if (this.config["fileType"] == 1) {
+            $.each(data, function(index, value) {
+                html += '<li class=\'d7c-file-li\'>';
+                html += '<span class=\'d7c-file-del-span\' ' + keys[0] + '=\'' + value[keys[0]] + '\' ' +
+                    keys[1] + '=\'' + value[keys[1]] + '\'><i class=\'d7c-file-icon-bin\'></i></span>';
+                html += '<a class=\'d7c-file-a\'>';
+                html += '<img class=\'d7c-file-img\' src=\'' + value[keys[2]] + '\' onclick="window.open(\'' + value[keys[2]] + '\')"/>';
+                html += '<span class=\'d7c-file-text-span\'>' + value[keys[1]] + '</span></a></li>';
+            });
+        } else if (this.config["fileType"] == 2) {
+            $.each(data, function(index, value) {
+                html += '<li class=\'d7c-file-li\'>';
+                html += '<span class=\'d7c-file-del-span\' ' + keys[0] + '=\'' + value[keys[0]] + '\' ' +
+                    keys[1] + '=\'' + value[keys[1]] + '\'><i class=\'d7c-file-icon-bin\'></i></span>';
+                html += '<a class=\'d7c-file-a\'><i class=\'d7c-file-icon-file-zip\'></i>';
+                html += '<span class=\'d7c-file-text-span\'>' + value[keys[1]] + '</span></a></li>';
+            });
+        }
 
         // 删除配置中的数据，因为已经显示了，所以要释放空间
         delete this.config.data;
@@ -244,7 +278,6 @@ D7CFileUpload.prototype.appendInputClick = function(options) {
  */
 D7CFileUpload.prototype.choosePicture = function(options, _this) {
     let that = this;
-    let container = that.config["container"];
     if (!_this) {
         that.errorMsg("请先选择图片！");
         return;
@@ -266,7 +299,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
 
     // 异步请求
     let async = that.getValueByKey(options, "async");
-
+    let container = that.config["container"];
     // 单次上传数量检测
     let file_num = $('#' + container + ' > ul > input[display=none]').length;
     if (!async // 是否是异步请求，true 是
@@ -291,7 +324,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
          * 如果把表单的编码类型设置为 multipart/form-data，则通过 FormData 传输的数据格式和表单通过 submit() 方法传输的数据格式相同。
          */
         let formData = new FormData();
-        formData.append(keys[2], _this.files[0]);
+        formData.append(keys[1], getFile(_this));
         $.each(that.getValueByKey(options, "upload_data"), function(index, value) {
             formData.append(index, value);
         });
@@ -379,7 +412,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     d7c_file_config_pool[container]['next_del_id'] = that.config['next_del_id'] + 1;
 
     // 获取图片名称
-    let filename = _this.files[0].name;
+    let filename = getFilename(_this);
     // 获取图片本地预览 url
     let url = getFileUrl(_this);
 
@@ -398,7 +431,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
                 // 将新生成的 li 追加到原 ul 后
                 $('#' + container + ' > ul > li:last').before(li);
             };
-            reader.readAsDataURL(_this.files[0]);
+            reader.readAsDataURL(getFile(_this));
         } else { // browserVersion.indexOf("SAFARI") > -1
             that.errorMsg('不支持 Safari6.0 以下浏览器的图片预览!');
             return;
@@ -439,9 +472,9 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
             li += '<a class=\'d7c-file-a\'>';
             li += '<img class=\'d7c-file-img\' src=\'';
             if (firefoxVersion < 7) { // firefox7 以下版本
-                li += _this.files[0].getAsDataURL();
+                li += getFile(_this).getAsDataURL();
             } else { // firefox7.0+
-                li += window.URL.createObjectURL(_this.files[0]);
+                li += window.URL.createObjectURL(getFile(_this));
             }
             li += '\' onclick="window.open(\'' + url + '\')"/>';
             li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
@@ -475,13 +508,39 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
  */
 D7CFileUpload.prototype.chooseDoc = function(options, _this) {
     let that = this;
-
     if (!_this) {
         that.errorMsg("请先选择文档！");
         return;
     }
 
-    if (that.getValueByKey(options, "async")) { // 异步请求
+    // 文件类型检测
+    if (!isFileType(that.config.fileTypeStr, _this.value)) {
+        clearInput(_this);
+        that.errorMsg('仅支持 ' + that.config.fileTypeStr.join() + ' 为后缀名的文件!');
+        return;
+    }
+
+    // 上传文件大小检测
+    if (getFileSize(_this) > Number(that.config.max_size)) {
+        clearInput(_this);
+        that.errorMsg('文件不能大于' + that.config.max_size + 'KB!');
+        return;
+    }
+
+    // 异步请求
+    let async = that.getValueByKey(options, "async");
+    let container = that.config["container"];
+    // 单次上传数量检测
+    let file_num = $('#' + container + ' > ul > input[display=none]').length;
+    if (!async // 是否是异步请求，true 是
+        &&
+        file_num >= Number(that.config["max_num"])) {
+        clearInput(_this);
+        that.errorMsg('单次上传文件数量不能大于' + that.config["max_num"] + '张!');
+        return;
+    }
+
+    if (async) { // 异步请求
         // 上传文档 uri
         let upload_uri = that.getValueByKey(options, "upload_uri");
         if (isBlank(upload_uri)) {
@@ -490,13 +549,12 @@ D7CFileUpload.prototype.chooseDoc = function(options, _this) {
         }
 
         let keys = that.config["dataKey"];
-
         /**
          * 通过 FormData 对象可以组装一组用 XMLHttpRequest 发送请求的键/值对。它可以更灵活方便的发送表单数据，因此可以独立于表单使用。
          * 如果把表单的编码类型设置为 multipart/form-data，则通过 FormData 传输的数据格式和表单通过 submit() 方法传输的数据格式相同。
          */
         let formData = new FormData();
-        formData.append(keys[2], _this.files[0]);
+        formData.append(keys[1], getFile(_this));
         $.each(that.getValueByKey(options, "upload_data"), function(index, value) {
             formData.append(index, value);
         });
@@ -551,16 +609,14 @@ D7CFileUpload.prototype.chooseDoc = function(options, _this) {
  */
 D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
     let that = this;
-
     if (!_this) {
         that.errorMsg("请先选择文档！");
         return;
     }
 
     let container = that.config["container"];
-
     // 单次上传数量检测
-    let file_num = $('#' + container + ' > input[display=none]').length;
+    let file_num = $('#' + container + ' > ul > input[display=none]').length;
     /**
      * 是否显示追加文件按钮，必须在追加模式下：
      * 1、不是异步请求并且当前上传的文件数量小于单次请求允许上传的最大数量；
@@ -587,14 +643,14 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
 
     // 画文档显示区域
     let keys = that.config["dataKey"];
-    let filename = _this.files[0].name;
+    let filename = getFilename(_this);
     let li = '<li class=\'d7c-file-li\'>';
     li += '<span class=\'d7c-file-del-span\' ' + container + '_span=\'' + next_del_id + '\' ' + keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
     li += '<i class=\'d7c-file-icon-bin\'></i></span>';
     li += '<a class=\'d7c-file-a\'><i class=\'d7c-file-icon-file-zip\'></i>';
     li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
     // 将新生成的 li 追加到原 ul 后
-    $('#' + container + ' > ul').append(li);
+    $('#' + container + ' > ul > li:last').before(li);
 
     // 将当前 input 隐藏并设置删除 id
     $(_this).attr('display', 'none').attr("del", next_del_id);
@@ -797,7 +853,7 @@ D7CFileUpload.prototype.showImages = function(options, _this, imgContainer, call
                 img += e.target.result + '\' />';
                 $(imgContainer).append(img);
             };
-            reader.readAsDataURL(_this.files[0]);
+            reader.readAsDataURL(getFile(_this));
         } else { // browserVersion.indexOf("SAFARI") > -1
             msg = '不支持 Safari6.0 以下浏览器的图片预览!';
             if (callBack) {
@@ -829,9 +885,9 @@ D7CFileUpload.prototype.showImages = function(options, _this, imgContainer, call
         } else if (browserVersion.indexOf("FIREFOX") > -1) { // firefox
             let firefoxVersion = parseFloat(browserVersion.toLowerCase().match(/firefox\/([\d.]+)/)[1]);
             if (firefoxVersion < 7) { // firefox7 以下版本
-                img += _this.files[0].getAsDataURL() + '\' />';
+                img += getFile(_this).getAsDataURL() + '\' />';
             } else { // firefox7.0+
-                img += window.URL.createObjectURL(_this.files[0]) + '\' />';
+                img += window.URL.createObjectURL(getFile(_this)) + '\' />';
             }
             $(imgContainer).append(img);
         } else {
