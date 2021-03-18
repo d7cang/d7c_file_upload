@@ -245,7 +245,6 @@ D7CFileUpload.prototype.appendInputClick = function(options) {
 D7CFileUpload.prototype.choosePicture = function(options, _this) {
     let that = this;
     let container = that.config["container"];
-
     if (!_this) {
         that.errorMsg("请先选择图片！");
         return;
@@ -272,7 +271,7 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
     let file_num = $('#' + container + ' > ul > input[display=none]').length;
     if (!async // 是否是异步请求，true 是
         &&
-        file_num > Number(that.config["max_num"])) {
+        file_num >= Number(that.config["max_num"])) {
         clearInput(_this);
         that.errorMsg('单次上传文件数量不能大于' + that.config["max_num"] + '张!');
         return;
@@ -287,7 +286,6 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
         }
 
         let keys = that.config["dataKey"];
-
         /**
          * 通过 FormData 对象可以组装一组用  XMLHttpRequest 发送请求的键/值对。它可以更灵活方便的发送表单数据，因此可以独立于表单使用。
          * 如果把表单的编码类型设置为 multipart/form-data，则通过 FormData 传输的数据格式和表单通过 submit() 方法传输的数据格式相同。
@@ -348,14 +346,12 @@ D7CFileUpload.prototype.choosePicture = function(options, _this) {
  */
 D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     let that = this;
-
     if (!_this) {
         that.errorMsg("请先选择图片！");
         return;
     }
 
     let container = that.config["container"];
-
     // 单次上传数量检测
     let file_num = $('#' + container + ' > ul > input[display=none]').length;
     /**
