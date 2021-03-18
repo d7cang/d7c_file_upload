@@ -34,9 +34,18 @@
                             <span class="d7c-file-text-span">淘宝店铺地址</span>
                         </a>
                     </li>
+                    <li class="d7c-file-li">
+                        <span class="d7c-file-del-span"><i class="d7c-file-icon-bin"></i></span>
+                        <a class="d7c-file-a">
+                            <img src="./images/taobao.png" class="d7c-file-img" onclick="window.open('./images/taobao.png')" />
+                            <span class="d7c-file-text-span">淘宝店铺地址</span>
+                        </a>
+                    </li>
+                    <li class="d7c-file-li">
+                        <a class="d7c-file-a-choose"><i class="d7c-file-icon-cloud-upload"></i></a>
+                    </li>
+                    <input type="file" name="file1" style="width: 0; height: 0;" />
                 </ul>
-                <input type="file" name="file1" style="width: 0; height: 0;" />
-                <a class="d7c-file-a-choose"><i class="d7c-file-icon-cloud-upload"></i></a>
             </div>
             <hr style="border:1px dotted #A9A9A9" />
             <div id="d7cFileContainer1" class="d7c-file-container"></div>
@@ -64,7 +73,7 @@
                 }],
                 "name": "d7cfile1",
                 "dataKey": ['id1', 'name1', 'uri'], // 数据 json 中的键值
-                "max_num": 2,
+                "max_num": 3,
                 // 删除
                 "del_uri": "127.0.0.1:8080/d7c/file/deluri",
                 "del_type": "GET",

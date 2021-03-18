@@ -1,6 +1,8 @@
 ;
 'use strict';
 let $ = $ || window.jQuery;
+// 获取浏览器类型
+const browserVersion = window.navigator.userAgent.toUpperCase();
 
 // 是否是空
 function isBlank(obj) {
@@ -48,6 +50,8 @@ function isFileType(types, filename) {
     return flag;
 }
 
+// document 对象中使用 files 属性获取文件数组对象，eg：document.getElementsByTagName("input")[0].files[0]
+// JQuery 对象中使用 .prop('files') 获取文件数组对象，eg：$("input").prop('files')
 /**
  * 获取文件大小
  * @param {Object} target input 文件框对象
@@ -86,9 +90,8 @@ function getFileUrl(_this) {
 /**
  * 清空 input 框文件内容
  * @param {Object} _this
- * @param {Object} browserVersion
  */
-function clearInput(_this, browserVersion) {
+function clearInput(_this) {
     _this.value = "";
     if (browserVersion.indexOf("MSIE") > -1) {
         _this.select();
@@ -176,13 +179,14 @@ D7CFileUpload.prototype.initFileList = function(options) {
         // 删除配置中的数据，因为已经显示了，所以要释放空间
         delete this.config.data;
     }
-    html += '</ul>';
 
     // 追加模式，并且还可以继续追加
     if (this.config["append"] && (this.getValueByKey(options, "async") || this.config["max_num"] > 0)) {
+        html += '<li class=\'d7c-file-li\'>';
+        html += '<a class=\'d7c-file-a-choose\'><i class=\'d7c-file-icon-cloud-upload\'></i></a></li>';
         html += '<input type=\'file\' name=\'' + this.config["name"] + '\' style=\'width: 0; height: 0;\' />';
-        html += '<a class=\'d7c-file-a-choose\'><i class=\'d7c-file-icon-cloud-upload\'></i></a>';
     }
+    html += '</ul>';
     $("#" + container).append(html);
 
     // 给图片绑定删除事件
@@ -203,7 +207,7 @@ D7CFileUpload.prototype.spanAddClick = function(options) {
 
 // 给追加按钮添加点击事件
 D7CFileUpload.prototype.appendButton = function(options) {
-    let num = $('#' + this.config["container"] + ' > input[display=none]').length;
+    let num = $('#' + this.config["container"] + ' > ul > input[display=none]').length;
     if (this.config["append"] && (this.getValueByKey(options, "async") || this.config["max_num"] > num)) {
         // 文件列表末尾增加一个 input 内容改变事件
         this.appendInputChange(options);
@@ -216,41 +220,20 @@ D7CFileUpload.prototype.appendButton = function(options) {
 D7CFileUpload.prototype.appendInputChange = function(options) {
     let that = this;
     let container = that.config["container"];
-    $("#" + container).delegate(" > input[display!=none]", "change", function() {
-        // 获取当前容器配置参数
-        let config = d7c_file_config_pool[container];
-        // 获取浏览器类型
-        let browserVersion = window.navigator.userAgent.toUpperCase();
-
-        // 文件类型检测
-        if (!isFileType(config.fileTypeStr, this.value)) {
-            clearInput(this, browserVersion);
-            that.errorMsg('仅支持 ' + config.fileTypeStr.join() + ' 为后缀名的文件!');
-            return;
-        }
-
-        // 上传文件大小检测
-        if (getFileSize(this) > Number(config.max_size)) {
-            clearInput(this, browserVersion);
-            that.errorMsg('文件不能大于' + config.max_size + 'KB!');
-            return;
-        }
-
-        // 单次上传数量检测
-        let file_num = $('#' + container + ' input[name=' + that.config["name"] + ']').length;
-        if (!config.async // 是否是异步请求，true 是
-            &&
-            file_num > Number(config.max_num)) {
-            clearInput(this, browserVersion);
-            that.errorMsg('单次上传文件数量不能大于' + config.max_num + '张!');
-            return;
-        }
-
-        if (config.fileType == 1) { // 图片类型
+    $("#" + container).delegate(" > ul > input[display!=none]", "change", function() {
+        if (that.config.fileType == 1) { // 图片类型
             that.choosePicture(options, this);
-        } else if (config.fileType == 2) { // 文档类型
+        } else if (that.config.fileType == 2) { // 文档类型
             that.chooseDoc(options, this);
         }
+    });
+}
+
+// 文件列表末尾增加一个模拟点击 input 的自定义按钮
+D7CFileUpload.prototype.appendInputClick = function(options) {
+    let container = this.config["container"];
+    $("#" + container + " > ul li:last > a").on("click", function() {
+        $("#" + container + " > ul > input[display!=none]").click();
     });
 }
 
@@ -261,14 +244,40 @@ D7CFileUpload.prototype.appendInputChange = function(options) {
  */
 D7CFileUpload.prototype.choosePicture = function(options, _this) {
     let that = this;
+    let container = that.config["container"];
 
     if (!_this) {
         that.errorMsg("请先选择图片！");
         return;
     }
 
+    // 文件类型检测
+    if (!isFileType(that.config.fileTypeStr, _this.value)) {
+        clearInput(_this);
+        that.errorMsg('仅支持 ' + that.config.fileTypeStr.join() + ' 为后缀名的文件!');
+        return;
+    }
+
+    // 上传文件大小检测
+    if (getFileSize(_this) > Number(that.config.max_size)) {
+        clearInput(_this);
+        that.errorMsg('文件不能大于' + that.config.max_size + 'KB!');
+        return;
+    }
+
     // 异步请求
     let async = that.getValueByKey(options, "async");
+
+    // 单次上传数量检测
+    let file_num = $('#' + container + ' > ul > input[display=none]').length;
+    if (!async // 是否是异步请求，true 是
+        &&
+        file_num > Number(that.config["max_num"])) {
+        clearInput(_this);
+        that.errorMsg('单次上传文件数量不能大于' + that.config["max_num"] + '张!');
+        return;
+    }
+
     if (async) {
         // 上传图片 uri
         let upload_uri = that.getValueByKey(options, "upload_uri");
@@ -347,11 +356,8 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
 
     let container = that.config["container"];
 
-    // 获取浏览器类型
-    let browserVersion = window.navigator.userAgent.toUpperCase();
-
     // 单次上传数量检测
-    let file_num = $('#' + container + ' > input[display=none]').length;
+    let file_num = $('#' + container + ' > ul > input[display=none]').length;
     /**
      * 是否显示追加文件按钮，必须在追加模式下：
      * 1、不是异步请求并且当前上传的文件数量小于单次请求允许上传的最大数量；
@@ -359,17 +365,22 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
      */
     let is_can_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num < Number(that.config["max_num"]));
     if (is_can_append) {
+        /* // ------- clone 以后下次再上传同一个文件没有反应
         // 克隆追加按钮
         let _clone_this = $(_this).clone();
-        clearInput(_clone_this, browserVersion);
+        clearInput(_clone_this);
         // 将一个空的追加按钮放到容器最后
-        $(_clone_this).appendTo("#" + container);
+        $(_clone_this).appendTo("#" + container + " > ul"); */
+
+        // ------- 重新画一个新的 input
+        let _clone_this = '<input type=\'file\' name=\'' + that.config["name"] + '\' style=\'width: 0; height: 0;\' />';
+        $(_clone_this).appendTo("#" + container + " > ul");
     }
 
     // 删除按钮的 id 编号
     let next_del_id = container + '_span_' + that.config['next_del_id'];
     // 更新配置池中下一个删除按钮的 id 编号
-    d7c_file_config_pool[container]['next_del_id'] = next_del_id + 1;
+    d7c_file_config_pool[container]['next_del_id'] = that.config['next_del_id'] + 1;
 
     // 获取图片名称
     let filename = _this.files[0].name;
@@ -389,7 +400,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
                 li += '<img class=\'d7c-file-img\' src=\'' + e.target.result + '\' onclick="window.open(\'' + url + '\')" />';
                 li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
                 // 将新生成的 li 追加到原 ul 后
-                $('#' + container + ' > ul').append(li);
+                $('#' + container + ' > ul > li:last').before(li);
             };
             reader.readAsDataURL(_this.files[0]);
         } else { // browserVersion.indexOf("SAFARI") > -1
@@ -406,7 +417,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
                 li += '<img class=\'d7c-file-img\' src=\'' + _value + '\' onclick="window.open(\'' + url + '\')"/>';
                 li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
                 // 将新生成的 li 追加到原 ul 后
-                $('#' + container + ' > ul').append(li);
+                $('#' + container + ' > ul > li:last').before(li);
             } else { // ie[7-9]
                 _this.select();
                 if (browserVersion.indexOf("MSIE 9") > -1) {
@@ -423,7 +434,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
                 $li.parentNode.insertBefore($li, $li_temp);
                 $li.style.display = "none";
                 // 将新生成的 li 追加到原 ul 后
-                $('#' + container + ' > ul').append($li_temp);
+                $('#' + container + ' > ul > li:last').before($li_temp);
             }
         } else if (browserVersion.indexOf("FIREFOX") > -1) { // firefox
             let firefoxVersion = parseFloat(browserVersion.toLowerCase().match(/firefox\/([\d.]+)/)[1]);
@@ -439,7 +450,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
             li += '\' onclick="window.open(\'' + url + '\')"/>';
             li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
             // 将新生成的 li 追加到原 ul 后
-            $('#' + container + ' > ul').append(li);
+            $('#' + container + ' > ul > li:last').before(li);
         } else {
             li += keys[0] + '=\'' + fileId + '\' ' + keys[1] + '=\'' + filename + '\'>';
             li += '<i class=\'d7c-file-icon-bin\'></i></span>';
@@ -447,7 +458,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
             li += '<img class=\'d7c-file-img\' src=\'' + _value + '\' onclick="window.open(\'' + url + '\')"/>';
             li += '<span class=\'d7c-file-text-span\'>' + filename + '</span></a></li>';
             // 将新生成的 li 追加到原 ul 后
-            $('#' + container + ' > ul').append(li);
+            $('#' + container + ' > ul > li:last').before(li);
         }
     }
 
@@ -457,7 +468,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     // 隐藏追加按钮
     let is_show_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num + 1 >= Number(that.config["max_num"]));
     if (is_show_append) {
-        $('#' + container + ' > a').hide();
+        $('#' + container + ' > ul > li:last').hide();
     }
 }
 
@@ -552,9 +563,6 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
 
     let container = that.config["container"];
 
-    // 获取浏览器类型
-    let browserVersion = window.navigator.userAgent.toUpperCase();
-
     // 单次上传数量检测
     let file_num = $('#' + container + ' > input[display=none]').length;
     /**
@@ -564,17 +572,22 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
      */
     let is_can_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num < Number(that.config["max_num"]));
     if (is_can_append) {
+        /* // ------- clone 以后下次再上传同一个文件没有反应
         // 克隆追加按钮
         let _clone_this = $(_this).clone();
-        clearInput(_clone_this, browserVersion);
+        clearInput(_clone_this);
         // 将一个空的追加按钮放到容器最后
-        $(_clone_this).appendTo("#" + container);
+        $(_clone_this).appendTo("#" + container + " > ul"); */
+
+        // ------- 重新画一个新的 input
+        let _clone_this = '<input type=\'file\' name=\'' + that.config["name"] + '\' style=\'width: 0; height: 0;\' />';
+        $(_clone_this).appendTo("#" + container + " > ul");
     }
 
     // 删除按钮的 id 编号
     let next_del_id = container + '_span_' + that.config['next_del_id'];
     // 更新配置池中下一个删除按钮的 id 编号
-    d7c_file_config_pool[container]['next_del_id'] = next_del_id + 1;
+    d7c_file_config_pool[container]['next_del_id'] = that.config['next_del_id'] + 1;
 
     // 画文档显示区域
     let keys = that.config["dataKey"];
@@ -593,7 +606,7 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
     // 隐藏追加按钮
     let is_show_append = that.config["append"] && (that.getValueByKey(options, "async") || file_num + 1 >= Number(that.config["max_num"]));
     if (is_show_append) {
-        $('#' + container + ' > a').hide();
+        $('#' + container + ' > ul > li:last').hide();
     }
 }
 
@@ -615,14 +628,6 @@ D7CFileUpload.prototype.successMsg = function(msg) {
     } else {
         alert(msg);
     }
-}
-
-// 文件列表末尾增加一个模拟点击 input 的自定义按钮
-D7CFileUpload.prototype.appendInputClick = function(options) {
-    let container = this.config["container"];
-    $("#" + container + " > a").on("click", function() {
-        $("#" + container + " > input[display!=none]").click()
-    });
 }
 
 /**
@@ -657,7 +662,7 @@ D7CFileUpload.prototype.deleteLocalFile = function(options, _this, id, name) {
     let container_span = $(_this).attr(container + "_span");
     if (!isBlank(container_span)) {
         // 获取 input 框上 del 属性的值为 container_span 的 input 对象
-        let $input = $("#" + container + " input[del=" + container_span + "]");
+        let $input = $("#" + container + " > ul > input[del=" + container_span + "]");
 
         // 清空 input 框文件内容
         clearInput($input, window.navigator.userAgent.toUpperCase());
@@ -670,9 +675,11 @@ D7CFileUpload.prototype.deleteLocalFile = function(options, _this, id, name) {
     // 删除 li
     $li.remove();
 
-    // 如果没有显示对象时调节样式
-    if ($("#" + container + " > ul > li").length == 0) {
-        $("#" + container + " > a").css("margin-left", "10px");
+    // 删除后显示追加按钮
+    let file_num = $('#' + container + ' > input[display=none]').length;
+    let is_show_append = this.config["append"] && (this.getValueByKey(options, "async") || file_num < Number(this.config["max_num"]));
+    if (is_show_append) {
+        $('#' + container + ' > ul > li:last').show();
     }
 }
 
@@ -810,8 +817,6 @@ D7CFileUpload.prototype.showImages = function(options, _this, imgContainer, call
             return;
         }
     } else {
-        // 获取浏览器类型
-        let browserVersion = window.navigator.userAgent.toUpperCase();
         let _value = _this.value;
         if (browserVersion.indexOf("MSIE") > -1) {
             if (browserVersion.indexOf("MSIE 6") > -1) { // ie6
