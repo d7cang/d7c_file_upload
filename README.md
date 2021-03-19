@@ -1,10 +1,11 @@
 # d7c_file_upload
 
 #### 介绍
-&emsp;&emsp;一个实用的 web 页面文件上传插件
+&emsp;&emsp;一个实用的 web 页面文件上传插件，以支持全浏览器为目标。
 
 #### 软件架构
-&emsp;&emsp;一个实用的 web 页面文件上传插件。
+&emsp;&emsp;一个实用的 web 页面文件上传插件，以支持全浏览器为目标。技术：JQuery + JavaScript。
+![示例图片](https://images.gitee.com/uploads/images/2021/0319/205559_20cc712f_1070311.png "QQ图片20210319205541.png")
 
 #### 安装教程
 1.  在远程仓库中新建该项目，并 check 一份到本地
