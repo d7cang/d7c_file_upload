@@ -125,9 +125,6 @@ function clearInput(target) {
     target.outerHTML = target.outerHTML;
 }
 
-// 配置池，单页面可以创建多个实例
-var d7c_file_config_pool = {};
-
 function D7CFileUpload(options) {
     // 实例默认配置，参数类型 N 类：初始化后不可变，M 类：初始化后可变
     this.config = {
@@ -170,7 +167,6 @@ D7CFileUpload.prototype.initConfig = function(options) {
     if ((this.config["container"] + '_span') == this.config["dataKey"][0]) {
         throw new Error("dataKey 的第一个属性不能为" + this.config["container"] + "_span！");
     }
-    d7c_file_config_pool[this.config.container] = this.config;
 }
 
 // 获取属性值，如果 options 中有值就取 options 中的值，否则取默认配置中的值
@@ -409,7 +405,7 @@ D7CFileUpload.prototype.makePicture = function(options, _this, fileId) {
     // 删除按钮的 id 编号
     let next_del_id = container + '_span_' + that.config['next_del_id'];
     // 更新配置池中下一个删除按钮的 id 编号
-    d7c_file_config_pool[container]['next_del_id'] = that.config['next_del_id'] + 1;
+    that.config['next_del_id'] = that.config['next_del_id'] + 1;
 
     // 获取图片名称
     let filename = getFilename(_this);
@@ -639,7 +635,7 @@ D7CFileUpload.prototype.makeDoc = function(options, _this, fileId) {
     // 删除按钮的 id 编号
     let next_del_id = container + '_span_' + that.config['next_del_id'];
     // 更新配置池中下一个删除按钮的 id 编号
-    d7c_file_config_pool[container]['next_del_id'] = that.config['next_del_id'] + 1;
+    that.config['next_del_id'] = that.config['next_del_id'] + 1;
 
     // 画文档显示区域
     let keys = that.config["dataKey"];
